@@ -1,0 +1,536 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "My API",
+    "version": "v1"
+  },
+  "paths": {
+    "/say/visitor-left": {
+      "get": {
+        "tags": [
+          "PrecannedVoice"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/say/unknown-left": {
+      "get": {
+        "tags": [
+          "PrecannedVoice"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/say/joiner-left": {
+      "get": {
+        "tags": [
+          "PrecannedVoice"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/calls/{id}/agent/twiml": {
+      "get": {
+        "tags": [
+          "Twilio"
+        ],
+        "summary": "Produces TwiML to support the agent LiveJoin.Voice.Model.VoiceCall call.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/calls/{id}/conf/status": {
+      "post": {
+        "tags": [
+          "Twilio"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "StatusCallbackEvent": {
+                    "type": "string"
+                  },
+                  "ConferenceSid": {
+                    "type": "string"
+                  },
+                  "CallSid": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "StatusCallbackEvent": {
+                  "style": "form"
+                },
+                "ConferenceSid": {
+                  "style": "form"
+                },
+                "CallSid": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/calls/{id}/agent/status": {
+      "post": {
+        "tags": [
+          "Twilio"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/calls/{id}/visitor/twiml": {
+      "get": {
+        "tags": [
+          "Twilio"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/calls/{callId}/joiner/{joinerId}/twiml": {
+      "get": {
+        "tags": [
+          "Twilio"
+        ],
+        "parameters": [
+          {
+            "name": "callId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "joinerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/calls": {
+      "post": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Initiates a voice call.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewVoiceCall"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewVoiceCall"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewVoiceCall"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/NewVoiceCall"
+              }
+            },
+            "text/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/NewVoiceCall"
+              }
+            },
+            "application/*+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/NewVoiceCall"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/calls/{id}/joiners": {
+      "post": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Adds a joiner to the call.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The call id.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "A joiner contract.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "text/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "application/*+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/calls/by-system/{systemId}/joiners": {
+      "post": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Adds a joiner to the call.",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The calling system id.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "A joiner contract.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "text/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            },
+            "application/*+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Joiner"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CallbackType": {
+        "enum": [
+          "CallEnd",
+          "CallerAnswer",
+          "CallerHangup",
+          "CallerEnter",
+          "CallerUnmute",
+          "CallerMute"
+        ],
+        "type": "string"
+      },
+      "CallbacksRecord": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CallbackType"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CallerType": {
+        "enum": [
+          "Agent",
+          "Visitor",
+          "Joiner"
+        ],
+        "type": "string"
+      },
+      "Agent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/CallerType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Visitor": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/CallerType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Account": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NewVoiceCall": {
+        "type": "object",
+        "properties": {
+          "system": {
+            "type": "string",
+            "nullable": true
+          },
+          "systemId": {
+            "type": "string",
+            "nullable": true
+          },
+          "callbacks": {
+            "$ref": "#/components/schemas/CallbacksRecord"
+          },
+          "agent": {
+            "$ref": "#/components/schemas/Agent"
+          },
+          "visitor": {
+            "$ref": "#/components/schemas/Visitor"
+          },
+          "account": {
+            "$ref": "#/components/schemas/Account"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Joiner": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "systemId": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "requirePositiveStart": {
+            "type": "boolean"
+          },
+          "requireUnmute": {
+            "type": "boolean"
+          },
+          "type": {
+            "$ref": "#/components/schemas/CallerType"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

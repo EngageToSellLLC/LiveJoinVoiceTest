@@ -1,0 +1,236 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@section Scripts{
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+	<script type="text/javascript">
+
+		var StartViewModel = function() {
+			var self = this;
+			self.accountId = ko.observable(1);
+			self.accountName = ko.observable('Test');
+			self.accountPhone = ko.observable('+19522604599');
+			self.agentId = ko.observable(2);
+			self.agentFirstName = ko.observable('Thomas');
+			self.agentLastName = ko.observable('Gordy');
+			self.agentPhone = ko.observable('+16234989969');
+			self.visitorFirstName = ko.observable('Paul');
+			self.visitorLastName = ko.observable('Reeder');
+			self.visitorPhone = ko.observable('+14692233676');
+			self.canEdit = ko.observable(true);
+		};
+
+		var JoinerViewModel = function() {
+			var self = this;
+			self.id = ko.observable(1);
+			self.name = ko.observable('Jane Adams');
+			self.phone = ko.observable('+18175551212');
+			self.positiveStart = ko.observable(false);
+			self.unmute = ko.observable(false);
+			self.canEdit = ko.observable(true);
+			self.clear = function() {
+				self.id(0);
+				self.name('');
+				self.phone('');
+				self.positiveStart(false);
+				self.unmute(false);
+			}
+		};
+		var MainViewModel = function() {
+			var self = this;
+			self.callId = @Model.CallId;
+			self.startInfo = new StartViewModel();
+			self.showStart = ko.observable(true);
+			self.joinerInfo = new JoinerViewModel();
+			self.showJoin = ko.observable(false);
+			self.events = ko.observableArray();
+			self.hasEvents = ko.pureComputed(function() { return self.events().length > 0; });
+
+
+			//SOCKET
+			self.socket = null;
+			self.socketOpen = function(eventInfo) {
+				self.events.push({
+					type: 'local',
+					data: 'Real time event communication established'
+				});
+			};
+			self.socketClose = function(eventInfo) {
+				self.events.push({
+					type: 'local',
+					data: 'Real time event communication dropped'
+				});
+			};
+			self.socketMessage = function (eventInfo) {
+				var jsonData = JSON.parse(eventInfo.data);
+				self.events.push(jsonData);
+			};
+			self.socketError = function(eventInfo) {
+				self.events.push({
+					type: 'local',
+					data: 'Real time event socket failure'
+				});
+			};
+			var url = window.location.href.substring(0, window.location.href.indexOf('/', 8)).replace('http', 'ws') + '/api/events/' + self.callId;
+			self.socket = new WebSocket(url);
+			self.socket.onopen = self.socketOpen;
+			self.socket.onclose = self.socketClose;
+			self.socket.onmessage = self.socketMessage;
+			self.socket.onerror = self.socketError;
+
+			//EVENTS
+			self.startCall = function() {
+				self.startInfo.canEdit(false);
+
+				$.ajax({
+					method: 'GET',
+					url: '/api/events/start/' + self.callId,
+					data: {
+						accountId: self.startInfo.accountId(),
+						accountName: self.startInfo.accountName(),
+						accountPhone: self.startInfo.accountPhone(),
+						agentId: self.startInfo.agentId(),
+						agentFirstName: self.startInfo.agentFirstName(),
+						agentLastName: self.startInfo.agentLastName(),
+						agentPhone: self.startInfo.agentPhone(),
+						visitorFirstName: self.startInfo.visitorFirstName(),
+						visitorLastName: self.startInfo.visitorLastName(),
+						visitorPhone: self.startInfo.visitorPhone()
+					},
+					success: function() {
+						toastr.success('Call started');
+						self.showStart(false);
+						self.showJoin(true);
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						toastr.error('Failed to start call due to error ' + textStatus + ': ' + errorThrown);
+					},
+					complete: function() {
+						self.startInfo.canEdit(true);
+					}
+				});
+			};
+
+			self.joinCall = function() {
+				self.joinerInfo.canEdit(false);
+				$.ajax({
+					method: 'GET',
+					url: '/api/events/join/' + self.callId,
+					data: {
+						joinerId: self.joinerInfo.id(),
+						joinerName: self.joinerInfo.name(),
+						joinerPhone: self.joinerInfo.phone(),
+						joinerPositiveStart: self.joinerInfo.positiveStart(),
+						joinerUnmute: self.joinerInfo.unmute()
+					},
+					success: function() {
+						toastr.success('Joiner added');
+						self.joinerInfo.clear();
+					},
+					error: function(jqXHR, textStatus, errorThrow) {
+						toastr.error('Failed to add joiner to call due to error ' + textStatus + ': ' + errorThrown);
+					},
+					complete: function() {
+						self.joinerInfo.canEdit(true);
+					}
+				});
+			};
+		}
+
+		var vm = new MainViewModel();
+		ko.applyBindings(vm);
+	</script>
+}
+
+<div data-bind="visible: showStart, with: startInfo">
+	<h1>Call Start Info</h1>
+	<div class="form-group">
+			<label for="accountId">Account ID</label>
+			<input type="number" class="form-control" id="accountId" data-bind="value: accountId, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="accountName">Account Name</label>
+			<input type="text" class="form-control" id="accountName" data-bind="value: accountName, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="accountPhone">Account Phone Number</label>
+			<input type="text" class="form-control" id="accountPhone" data-bind="value: accountPhone, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="agentId">Agent ID</label>
+			<input type="number" class="form-control" id="agentId" data-bind="value: agentId, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="agentFirstName">Agent First Name</label>
+			<input type="text" class="form-control" id="agentFirstName" data-bind="value: agentFirstName, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="agentLastName">Agent Last Name</label>
+			<input type="text" class="form-control" id="agentLastName" data-bind="value: agentLastName, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="agentPhone">Agent Phone</label>
+			<input type="text" class="form-control" id="agentPhone" data-bind="value: agentPhone, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="visitorFirstName">Visitor First Name</label>
+			<input type="text" class="form-control" id="visitorFirstName" data-bind="value: visitorFirstName, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="visitorLastName">Visitor Last Name</label>
+			<input type="text" class="form-control" id="visitorLastName" data-bind="value: visitorLastName, enabled: canEdit" />
+		</div>
+		<div class="form-group">
+			<label for="visitorPhone">Visitor Phone</label>
+			<input type="text" class="form-control" id="visitorPhone" data-bind="value: visitorPhone, enabled: canEdit" />
+		</div>
+		<input type="button" class="btn btn-primary" data-bind="click: $parent.startCall" value="Start Call" />
+</div>
+
+<div data-bind="visible: showJoin, with: joinerInfo">
+	<h1>Add Visitor</h1>
+	<div class="form-group">
+		<label for="joinerId">ID</label>
+		<input type="number" class="form-control" id="joinerId" data-bind="value: id"/>
+	</div>
+	<div class="form-group">
+		<label for="joinerName">Name</label>
+		<input type="text" class="form-control" id="joinerName" data-bind="value: name" />
+	</div>
+	<div class="form-group">
+		<label for="joinerPhone">Phone</label>
+		<input type="text" class="form-control" id="joinerPhone" data-bind="value: joinerPhone" />
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="joinerPositiveStart" data-bind="checked: positiveStart" />
+		<label for="joinerPositiveStart">Require Positive Call Start</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="joinerUnmute" data-bind="value: unmute" />
+		<label for="joinerUnmute">Require Unmute</label>
+	</div>
+	<input type="button" class="btn btn-primary" data-bind="click: $parent.joinCall" value="Add Joiner" />
+</div>
+
+<div data-bind="visible: hasEvents">
+	<h1>Log:</h1>
+	<div>
+		<table>
+			<thead>
+			<tr>
+				<td>Type</td>
+				<td>Info</td>
+			</tr>
+			</thead>
+			<tbody data-bind="foreach: events">
+			<tr>
+				<td data-bind="text: type"></td>
+				<td data-bind="text: data"></td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
