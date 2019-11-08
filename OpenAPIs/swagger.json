@@ -50,6 +50,27 @@
         }
       }
     },
+    "/say/joiner-joined": {
+      "get": {
+        "tags": [
+          "PrecannedVoice"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/calls/{id}/agent/twiml": {
       "get": {
         "tags": [
@@ -275,32 +296,32 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "text/xml": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "application/*+xml": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             }
           }
@@ -334,32 +355,32 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "text/xml": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             },
             "application/*+xml": {
               "schema": {
-                "$ref": "#/components/schemas/Joiner"
+                "$ref": "#/components/schemas/NewJoiner"
               }
             }
           }
@@ -402,14 +423,6 @@
         },
         "additionalProperties": false
       },
-      "CallerType": {
-        "enum": [
-          "Agent",
-          "Visitor",
-          "Joiner"
-        ],
-        "type": "string"
-      },
       "Agent": {
         "type": "object",
         "properties": {
@@ -428,9 +441,6 @@
           "lastName": {
             "type": "string",
             "nullable": true
-          },
-          "type": {
-            "$ref": "#/components/schemas/CallerType"
           }
         },
         "additionalProperties": false
@@ -449,9 +459,6 @@
           "lastName": {
             "type": "string",
             "nullable": true
-          },
-          "type": {
-            "$ref": "#/components/schemas/CallerType"
           }
         },
         "additionalProperties": false
@@ -500,13 +507,9 @@
         },
         "additionalProperties": false
       },
-      "Joiner": {
+      "NewJoiner": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "nullable": true
-          },
           "systemId": {
             "type": "string",
             "nullable": true
@@ -524,9 +527,6 @@
           },
           "requireUnmute": {
             "type": "boolean"
-          },
-          "type": {
-            "$ref": "#/components/schemas/CallerType"
           }
         },
         "additionalProperties": false

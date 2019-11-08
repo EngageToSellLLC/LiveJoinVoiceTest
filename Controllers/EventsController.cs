@@ -90,7 +90,7 @@ namespace LiveJoinVoiceTest.Controllers
                 });
 
                 var callId = Guid.NewGuid();
-                _ = Log(id, "info", $"Call started for account ({accountId}/{accountName}/{accountPhone}) between agent ({agentId}/{agentFirstName} {agentLastName}/{agentPhone}) and visitor ({visitorFirstName}/{visitorLastName}) => {callId}");
+                _ = Log(id, "info", $"Call started for account ({accountId}/{accountName}/{accountPhone}) between agent ({agentId}/{agentFirstName} {agentLastName}/{agentPhone}) and visitor ({visitorFirstName} {visitorLastName}/{visitorPhone}) => {callId}");
                 CallIds[id] = callId;
             }
             catch (Exception e)
@@ -101,18 +101,17 @@ namespace LiveJoinVoiceTest.Controllers
         }
 
         [HttpGet("join/{id}")]
-        public async void AddJoiner(int id, int joinerId, string joinerName, string joinerPhone, bool joinerPositiveStart, bool joinerUnmute)
+        public async Task AddJoiner(int id, int joinerId, string joinerName, string joinerPhone, bool joinerPositiveStart, bool joinerUnmute)
         {
             var client = new swaggerClient(VoiceUrl, new HttpClient());
             try
             {
-                await client.Joiners2Async($"{Prefix}{id}", new Joiner
+                await client.Joiners2Async($"{Prefix}{id}", new NewJoiner
                 {
-                    Id = joinerId.ToString(),
                     Name = joinerName,
-                    Phone = joinerPhone,
+                    Phone = joinerPhone, 
                     RequirePositiveStart = joinerPositiveStart,
-                    RequireUnmute = joinerUnmute,
+                    RequireUnmute = joinerUnmute, 
                     SystemId = joinerId.ToString()
                 });
                 _ = Log(id, "info", $"Joiner ({joinerId}/{joinerName}/{joinerPhone}) added to call");
@@ -128,7 +127,7 @@ namespace LiveJoinVoiceTest.Controllers
         {
             lock (FileLock)
             {
-                _ = System.IO.File.AppendAllTextAsync($"{Directory}{Prefix}{id}.log", $"{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()} : {text}{Environment.NewLine}");
+                System.IO.File.AppendAllText($"{Directory}{Prefix}{id}.log", $"{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()} : {text}{Environment.NewLine}");
             }
             if (Sockets.ContainsKey(id))
             {
@@ -148,31 +147,31 @@ namespace LiveJoinVoiceTest.Controllers
             }
         }
 
+        private static Random _rand = new Random();
         static EventsController()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             var s = new char[4];
-            var rand = new Random();
             for (var i = 0; i < s.Length; ++i)
             {
-                s[i] = chars[rand.Next(chars.Length)];
+                s[i] = chars[_rand.Next(chars.Length)];
             }
             Prefix = new string(s);
         }
 
         public static int GetNextId()
         {
-            return ++NextId;
+            return _rand.Next(int.MaxValue);
         }
 
-        [HttpPost]
+        [HttpPost("{id}")]
         public async void PostCallback(int id)
         {
             using (var reader = new StreamReader(Request.Body))
             {
                 var jsonString = reader.ReadToEnd();
                 lock (FileLock){
-                    _ = System.IO.File.AppendAllTextAsync($"{Directory}{Prefix}{id}.log", $"{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()} : {jsonString}{Environment.NewLine}");
+                    System.IO.File.AppendAllText($"{Directory}{Prefix}{id}.log", $"{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()} : {jsonString}{Environment.NewLine}");
                 }
 
                 if (Sockets.ContainsKey(id))
@@ -198,7 +197,7 @@ namespace LiveJoinVoiceTest.Controllers
         }
 
         [HttpGet("{id}")]
-        public async void Index(int id)
+        public async Task Index(int id)
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {

@@ -202,14 +202,14 @@
 	</div>
 	<div class="form-group">
 		<label for="joinerPhone">Phone</label>
-		<input type="text" class="form-control" id="joinerPhone" data-bind="value: joinerPhone" />
+		<input type="text" class="form-control" id="joinerPhone" data-bind="value: phone" />
 	</div>
 	<div class="form-group">
 		<input type="checkbox" class="form-check-inline" id="joinerPositiveStart" data-bind="checked: positiveStart" />
 		<label for="joinerPositiveStart">Require Positive Call Start</label>
 	</div>
 	<div class="form-group">
-		<input type="checkbox" class="form-check-inline" id="joinerUnmute" data-bind="value: unmute" />
+		<input type="checkbox" class="form-check-inline" id="joinerUnmute" data-bind="checked: unmute" />
 		<label for="joinerUnmute">Require Unmute</label>
 	</div>
 	<input type="button" class="btn btn-primary" data-bind="click: $parent.joinCall" value="Add Joiner" />
