@@ -53,7 +53,7 @@ namespace LiveJoinVoiceTest
 
             var wsOptions = new WebSocketOptions
             {
-                KeepAliveInterval = TimeSpan.FromSeconds(60),
+                KeepAliveInterval = TimeSpan.FromSeconds(10),
                 ReceiveBufferSize = 4096
             };
             wsOptions.AllowedOrigins.Add("*");

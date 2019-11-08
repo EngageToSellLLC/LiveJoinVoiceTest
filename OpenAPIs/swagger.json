@@ -94,6 +94,54 @@
         }
       }
     },
+    "/calls/{id}/conf/recording": {
+      "post": {
+        "tags": [
+          "Twilio"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "RecordingStatus": {
+                    "type": "string"
+                  },
+                  "RecordingUrl": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "RecordingStatus": {
+                  "style": "form"
+                },
+                "RecordingUrl": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/calls/{id}/conf/status": {
       "post": {
         "tags": [
@@ -194,7 +242,7 @@
         }
       }
     },
-    "/calls/{callId}/joiner/{joinerId}/twiml": {
+    "/calls/{callId}/joiners/{joinerId}/twiml": {
       "get": {
         "tags": [
           "Twilio"
@@ -216,6 +264,21 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "digits",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "alreadyJoined",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -398,11 +461,11 @@
       "CallbackType": {
         "enum": [
           "CallEnd",
-          "CallerAnswer",
-          "CallerHangup",
           "CallerEnter",
+          "CallerHangup",
           "CallerUnmute",
-          "CallerMute"
+          "CallerMute",
+          "RecordingAvailable"
         ],
         "type": "string"
       },

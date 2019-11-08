@@ -60,7 +60,7 @@ namespace LiveJoinVoiceTest.Controllers
                         Types = new CallbackType[]
                         {
                             CallbackType.CallEnd,
-                            CallbackType.CallerAnswer,
+                            CallbackType.RecordingAvailable,
                             CallbackType.CallerEnter,
                             CallbackType.CallerHangup,
                             CallbackType.CallerMute,

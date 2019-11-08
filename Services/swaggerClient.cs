@@ -377,6 +377,76 @@ namespace Test.VoiceClient
     
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task RecordingAsync(System.Guid id, System.IO.Stream body)
+        {
+            return RecordingAsync(id, body, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task RecordingAsync(System.Guid id, System.IO.Stream body, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/calls/{id}/conf/recording");
+            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var content_ = new System.Net.Http.StreamContent(body);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("multipart/form-data");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200") 
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new ApiException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
         public System.Threading.Tasks.Task StatusAsync(System.Guid id, System.IO.Stream body)
         {
             return StatusAsync(id, body, System.Threading.CancellationToken.None);
@@ -582,15 +652,15 @@ namespace Test.VoiceClient
     
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task Twiml3Async(System.Guid callId, System.Guid joinerId)
+        public System.Threading.Tasks.Task Twiml3Async(System.Guid callId, System.Guid joinerId, string digits, bool? alreadyJoined)
         {
-            return Twiml3Async(callId, joinerId, System.Threading.CancellationToken.None);
+            return Twiml3Async(callId, joinerId, digits, alreadyJoined, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task Twiml3Async(System.Guid callId, System.Guid joinerId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task Twiml3Async(System.Guid callId, System.Guid joinerId, string digits, bool? alreadyJoined, System.Threading.CancellationToken cancellationToken)
         {
             if (callId == null)
                 throw new System.ArgumentNullException("callId");
@@ -599,9 +669,18 @@ namespace Test.VoiceClient
                 throw new System.ArgumentNullException("joinerId");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/calls/{callId}/joiner/{joinerId}/twiml");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/calls/{callId}/joiners/{joinerId}/twiml?");
             urlBuilder_.Replace("{callId}", System.Uri.EscapeDataString(ConvertToString(callId, System.Globalization.CultureInfo.InvariantCulture)));
             urlBuilder_.Replace("{joinerId}", System.Uri.EscapeDataString(ConvertToString(joinerId, System.Globalization.CultureInfo.InvariantCulture)));
+            if (digits != null) 
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("digits") + "=").Append(System.Uri.EscapeDataString(ConvertToString(digits, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (alreadyJoined != null) 
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("alreadyJoined") + "=").Append(System.Uri.EscapeDataString(ConvertToString(alreadyJoined, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
     
             var client_ = _httpClient;
             try
@@ -970,20 +1049,20 @@ namespace Test.VoiceClient
         [System.Runtime.Serialization.EnumMember(Value = @"CallEnd")]
         CallEnd = 0,
     
-        [System.Runtime.Serialization.EnumMember(Value = @"CallerAnswer")]
-        CallerAnswer = 1,
+        [System.Runtime.Serialization.EnumMember(Value = @"CallerEnter")]
+        CallerEnter = 1,
     
         [System.Runtime.Serialization.EnumMember(Value = @"CallerHangup")]
         CallerHangup = 2,
     
-        [System.Runtime.Serialization.EnumMember(Value = @"CallerEnter")]
-        CallerEnter = 3,
-    
         [System.Runtime.Serialization.EnumMember(Value = @"CallerUnmute")]
-        CallerUnmute = 4,
+        CallerUnmute = 3,
     
         [System.Runtime.Serialization.EnumMember(Value = @"CallerMute")]
-        CallerMute = 5,
+        CallerMute = 4,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"RecordingAvailable")]
+        RecordingAvailable = 5,
     
     }
     
