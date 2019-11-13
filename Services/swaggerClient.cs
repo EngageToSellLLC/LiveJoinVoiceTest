@@ -652,6 +652,82 @@ namespace Test.VoiceClient
     
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task PreTwimlAsync(System.Guid callId, System.Guid joinerId, string digits)
+        {
+            return PreTwimlAsync(callId, joinerId, digits, System.Threading.CancellationToken.None);
+        }
+    
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task PreTwimlAsync(System.Guid callId, System.Guid joinerId, string digits, System.Threading.CancellationToken cancellationToken)
+        {
+            if (callId == null)
+                throw new System.ArgumentNullException("callId");
+    
+            if (joinerId == null)
+                throw new System.ArgumentNullException("joinerId");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/calls/{callId}/joiners/{joinerId}/pre-twiml?");
+            urlBuilder_.Replace("{callId}", System.Uri.EscapeDataString(ConvertToString(callId, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Replace("{joinerId}", System.Uri.EscapeDataString(ConvertToString(joinerId, System.Globalization.CultureInfo.InvariantCulture)));
+            if (digits != null) 
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("digits") + "=").Append(System.Uri.EscapeDataString(ConvertToString(digits, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200") 
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new ApiException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
         public System.Threading.Tasks.Task Twiml3Async(System.Guid callId, System.Guid joinerId, string digits, bool? alreadyJoined)
         {
             return Twiml3Async(callId, joinerId, digits, alreadyJoined, System.Threading.CancellationToken.None);
@@ -1079,6 +1155,23 @@ namespace Test.VoiceClient
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.22.0 (Newtonsoft.Json v11.0.0.0)")]
+    public enum AnnouncementType
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Join")]
+        Join = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Leave")]
+        Leave = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Unmute")]
+        Unmute = 2,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Mute")]
+        Mute = 3,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.0.22.0 (Newtonsoft.Json v11.0.0.0)")]
     public partial class Agent 
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -1092,6 +1185,9 @@ namespace Test.VoiceClient
     
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastName { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("announcements", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public System.Collections.Generic.ICollection<AnnouncementType> Announcements { get; set; }
     
     
     }
@@ -1107,6 +1203,9 @@ namespace Test.VoiceClient
     
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastName { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("announcements", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public System.Collections.Generic.ICollection<AnnouncementType> Announcements { get; set; }
     
     
     }
@@ -1167,6 +1266,9 @@ namespace Test.VoiceClient
     
         [Newtonsoft.Json.JsonProperty("requireUnmute", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool RequireUnmute { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("announcements", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public System.Collections.Generic.ICollection<AnnouncementType> Announcements { get; set; }
     
     
     }

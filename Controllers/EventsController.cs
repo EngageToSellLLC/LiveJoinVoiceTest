@@ -35,9 +35,44 @@ namespace LiveJoinVoiceTest.Controllers
         }
 
         [HttpGet("start/{id}")]
-        public async Task Start(int id, int accountId, string accountName, string accountPhone, int agentId, string agentFirstName, string agentLastName, string agentPhone, string visitorFirstName, string visitorLastName, string visitorPhone)
+        public async Task Start(int id, int accountId, string accountName, string accountPhone, int agentId, string agentFirstName, string agentLastName, string agentPhone, bool? agentEnter, bool? agentLeave, bool? agentUnmute, bool? agentMute, string visitorFirstName, string visitorLastName, string visitorPhone, bool? visitorEnter, bool? visitorLeave, bool? visitorUnmute, bool? visitorMute)
         {
             var client = new swaggerClient(VoiceUrl, new HttpClient());
+            var agentAnnouncements = new List<AnnouncementType>();
+            if (agentEnter.HasValue && agentEnter.Value)
+            {
+                agentAnnouncements.Add(AnnouncementType.Join);
+            }
+            if (agentLeave.HasValue && agentLeave.Value)
+            {
+                agentAnnouncements.Add(AnnouncementType.Leave);
+            }
+            if (agentMute.HasValue && agentMute.Value)
+            {
+                agentAnnouncements.Add(AnnouncementType.Mute);
+            }
+            if (agentUnmute.HasValue && agentUnmute.Value)
+            {
+                agentAnnouncements.Add(AnnouncementType.Unmute);
+            }
+            var visitorAnnouncements = new List<AnnouncementType>();
+            if (visitorEnter.HasValue && visitorEnter.Value)
+            {
+                visitorAnnouncements.Add(AnnouncementType.Join);
+            }
+            if (visitorLeave.HasValue && visitorLeave.Value)
+            {
+                visitorAnnouncements.Add(AnnouncementType.Leave);
+            }
+            if (visitorMute.HasValue && visitorMute.Value)
+            {
+                visitorAnnouncements.Add(AnnouncementType.Mute);
+            }
+            if (visitorUnmute.HasValue && visitorUnmute.Value)
+            {
+                visitorAnnouncements.Add(AnnouncementType.Unmute);
+            }
+
             try
             {
                 await client.CallsAsync(new NewVoiceCall
@@ -53,7 +88,8 @@ namespace LiveJoinVoiceTest.Controllers
                         FirstName = agentFirstName,
                         Id = agentId,
                         LastName = agentLastName,
-                        Phone = agentPhone
+                        Phone = agentPhone,
+                        Announcements = agentAnnouncements
                     },
                     Callbacks = new CallbacksRecord
                     {
@@ -85,7 +121,8 @@ namespace LiveJoinVoiceTest.Controllers
                     {
                         FirstName = visitorFirstName,
                         LastName = visitorLastName,
-                        Phone = visitorPhone
+                        Phone = visitorPhone,
+                        Announcements = visitorAnnouncements
                     }
                 });
 
@@ -101,9 +138,26 @@ namespace LiveJoinVoiceTest.Controllers
         }
 
         [HttpGet("join/{id}")]
-        public async Task AddJoiner(int id, int joinerId, string joinerName, string joinerPhone, bool joinerPositiveStart, bool joinerUnmute)
+        public async Task AddJoiner(int id, int joinerId, string joinerName, string joinerPhone, bool joinerPositiveStart, bool joinerUnmute, bool? joinerAnnounceEnter, bool? joinerAnnounceLeave, bool? joinerAnnounceMute, bool? joinerAnnounceUnmute)
         {
             var client = new swaggerClient(VoiceUrl, new HttpClient());
+            var joinerAnnouncements = new List<AnnouncementType>();
+            if (joinerAnnounceEnter.HasValue && joinerAnnounceEnter.Value)
+            {
+                joinerAnnouncements.Add(AnnouncementType.Join);
+            }
+            if (joinerAnnounceLeave.HasValue && joinerAnnounceLeave.Value)
+            {
+                joinerAnnouncements.Add(AnnouncementType.Leave);
+            }
+            if (joinerAnnounceMute.HasValue && joinerAnnounceMute.Value)
+            {
+                joinerAnnouncements.Add(AnnouncementType.Mute);
+            }
+            if (joinerAnnounceUnmute.HasValue && joinerAnnounceUnmute.Value)
+            {
+                joinerAnnouncements.Add(AnnouncementType.Unmute);
+            }
             try
             {
                 await client.Joiners2Async($"{Prefix}{id}", new NewJoiner
@@ -112,7 +166,8 @@ namespace LiveJoinVoiceTest.Controllers
                     Phone = joinerPhone, 
                     RequirePositiveStart = joinerPositiveStart,
                     RequireUnmute = joinerUnmute, 
-                    SystemId = joinerId.ToString()
+                    SystemId = joinerId.ToString(),
+                    Announcements = joinerAnnouncements
                 });
                 _ = Log(id, "info", $"Joiner ({joinerId}/{joinerName}/{joinerPhone}) added to call");
             }
@@ -127,7 +182,7 @@ namespace LiveJoinVoiceTest.Controllers
         {
             lock (FileLock)
             {
-                System.IO.File.AppendAllText($"{Directory}{Prefix}{id}.log", $"{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()} : {text}{Environment.NewLine}");
+                System.IO.File.AppendAllText($"{Directory}{Prefix}{id}.log", $"{DateTime.UtcNow.ToString("MM/dd/yyyy HH:mm:ss.fff")} : {text}{Environment.NewLine}");
             }
             if (Sockets.ContainsKey(id))
             {

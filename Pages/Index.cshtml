@@ -20,6 +20,14 @@
 			self.visitorFirstName = ko.observable('Paul');
 			self.visitorLastName = ko.observable('Reeder');
 			self.visitorPhone = ko.observable('+14692233676');
+			self.agentAnnounceEnter = ko.observable(true);
+			self.agentAnnounceLeave = ko.observable(true);
+			self.agentAnnounceMute = ko.observable(true);
+			self.agentAnnounceUnmute = ko.observable(true);
+			self.visitorAnnounceEnter = ko.observable(true);
+			self.visitorAnnounceLeave = ko.observable(true);
+			self.visitorAnnounceMute = ko.observable(true);
+			self.visitorAnnounceUnmute = ko.observable(true);
 			self.canEdit = ko.observable(true);
 		};
 
@@ -31,6 +39,10 @@
 			self.positiveStart = ko.observable(false);
 			self.unmute = ko.observable(false);
 			self.canEdit = ko.observable(true);
+			self.announceEnter = ko.observable(true);
+			self.announceLeave = ko.observable(true);
+			self.announceMute = ko.observable(true);
+			self.announceUnmute = ko.observable(true);
 			self.clear = function() {
 				self.id(0);
 				self.name('');
@@ -96,9 +108,17 @@
 						agentFirstName: self.startInfo.agentFirstName(),
 						agentLastName: self.startInfo.agentLastName(),
 						agentPhone: self.startInfo.agentPhone(),
+						agentAnnounceEnter: self.startInfo.agentAnnounceEnter(),
+						agentAnnounceLeave: self.startInfo.agentAnnounceLeave(),
+						agentAnnounceMute: self.startInfo.agentAnnounceMute(),
+						agentAnnounceUnmute: self.startInfo.agentAnnounceUnmute(),
 						visitorFirstName: self.startInfo.visitorFirstName(),
 						visitorLastName: self.startInfo.visitorLastName(),
-						visitorPhone: self.startInfo.visitorPhone()
+						visitorPhone: self.startInfo.visitorPhone(),
+						visitorAnnounceEnter: self.startInfo.visitorAnnounceEnter(),
+						visitorAnnounceLeave: self.startInfo.visitorAnnounceLeave(),
+						visitorAnnounceMute: self.startInfo.visitorAnnounceMute(),
+						visitorAnnounceUnmute: self.startInfo.visitorAnnounceUnmute()
 					},
 					success: function() {
 						toastr.success('Call started');
@@ -124,7 +144,11 @@
 						joinerName: self.joinerInfo.name(),
 						joinerPhone: self.joinerInfo.phone(),
 						joinerPositiveStart: self.joinerInfo.positiveStart(),
-						joinerUnmute: self.joinerInfo.unmute()
+						joinerUnmute: self.joinerInfo.unmute(),
+						joinerAnnounceEnter: self.joinerInfo.announceEnter(),
+						joinerAnnounceLeave: self.joinerInfo.announceLeave(),
+						joinerAnnounceMute: self.joinerInfo.announceMute(),
+						joinerAnnounceUnmute: self.joinerInfo.announceUnmute()
 					},
 					success: function() {
 						toastr.success('Joiner added');
@@ -148,46 +172,78 @@
 <div data-bind="visible: showStart, with: startInfo">
 	<h1>Call Start Info</h1>
 	<div class="form-group">
-			<label for="accountId">Account ID</label>
-			<input type="number" class="form-control" id="accountId" data-bind="value: accountId, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="accountName">Account Name</label>
-			<input type="text" class="form-control" id="accountName" data-bind="value: accountName, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="accountPhone">Account Phone Number</label>
-			<input type="text" class="form-control" id="accountPhone" data-bind="value: accountPhone, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="agentId">Agent ID</label>
-			<input type="number" class="form-control" id="agentId" data-bind="value: agentId, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="agentFirstName">Agent First Name</label>
-			<input type="text" class="form-control" id="agentFirstName" data-bind="value: agentFirstName, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="agentLastName">Agent Last Name</label>
-			<input type="text" class="form-control" id="agentLastName" data-bind="value: agentLastName, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="agentPhone">Agent Phone</label>
-			<input type="text" class="form-control" id="agentPhone" data-bind="value: agentPhone, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="visitorFirstName">Visitor First Name</label>
-			<input type="text" class="form-control" id="visitorFirstName" data-bind="value: visitorFirstName, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="visitorLastName">Visitor Last Name</label>
-			<input type="text" class="form-control" id="visitorLastName" data-bind="value: visitorLastName, enabled: canEdit" />
-		</div>
-		<div class="form-group">
-			<label for="visitorPhone">Visitor Phone</label>
-			<input type="text" class="form-control" id="visitorPhone" data-bind="value: visitorPhone, enabled: canEdit" />
-		</div>
-		<input type="button" class="btn btn-primary" data-bind="click: $parent.startCall" value="Start Call" />
+		<label for="accountId">Account ID</label>
+		<input type="number" class="form-control" id="accountId" data-bind="value: accountId, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<label for="accountName">Account Name</label>
+		<input type="text" class="form-control" id="accountName" data-bind="value: accountName, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<label for="accountPhone">Account Phone Number</label>
+		<input type="text" class="form-control" id="accountPhone" data-bind="value: accountPhone, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<label for="agentId">Agent ID</label>
+		<input type="number" class="form-control" id="agentId" data-bind="value: agentId, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<label for="agentFirstName">Agent First Name</label>
+		<input type="text" class="form-control" id="agentFirstName" data-bind="value: agentFirstName, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<label for="agentLastName">Agent Last Name</label>
+		<input type="text" class="form-control" id="agentLastName" data-bind="value: agentLastName, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<label for="agentPhone">Agent Phone</label>
+		<input type="text" class="form-control" id="agentPhone" data-bind="value: agentPhone, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="agentAnnounceEnter" data-bind="checked: agentAnnounceEnter, enabled: canEdit" />
+		<label for="agentAnnounceEnter">Agent Announce Enter</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="agentAnnounceExit" data-bind="checked: agentAnnounceLeave, enabled: canEdit" />
+		<label for="agentAnnounceExit">Agent Announce Exit</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="agentAnnounceMute" data-bind="checked: agentAnnounceMute, enabled: canEdit" />
+		<label for="agentAnnounceMute">Agent Announce Mute</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="agentAnnounceUnmute" data-bind="checked: agentAnnounceUnmute, enabled: canEdit" />
+		<label for="agentAnnounceUnmute">Agent Announce Unmute</label>
+	</div>
+	<div class="form-group">
+		<label for="visitorFirstName">Visitor First Name</label>
+		<input type="text" class="form-control" id="visitorFirstName" data-bind="value: visitorFirstName, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<label for="visitorLastName">Visitor Last Name</label>
+		<input type="text" class="form-control" id="visitorLastName" data-bind="value: visitorLastName, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<label for="visitorPhone">Visitor Phone</label>
+		<input type="text" class="form-control" id="visitorPhone" data-bind="value: visitorPhone, enabled: canEdit" />
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="visitorAnnounceEnter" data-bind="checked: visitorAnnounceEnter, enabled: canEdit" />
+		<label for="visitorAnnounceEnter">Visitor Announce Enter</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="visitorAnnounceExit" data-bind="checked: visitorAnnounceLeave, enabled: canEdit" />
+		<label for="visitorAnnounceExit">Visitor Announce Exit</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="visitorAnnounceMute" data-bind="checked: visitorAnnounceMute, enabled: canEdit" />
+		<label for="visitorAnnounceMute">Visitor Announce Mute</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="visitorAnnounceUnmute" data-bind="checked: visitorAnnounceUnmute, enabled: canEdit" />
+		<label for="visitorAnnounceUnmute">Visitor Announce Unmute</label>
+	</div>
+	<input type="button" class="btn btn-primary" data-bind="click: $parent.startCall" value="Start Call" />
 </div>
 
 <div data-bind="visible: showJoin, with: joinerInfo">
@@ -211,6 +267,22 @@
 	<div class="form-group">
 		<input type="checkbox" class="form-check-inline" id="joinerUnmute" data-bind="checked: unmute" />
 		<label for="joinerUnmute">Require Unmute</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="joinerAnnounceEnter" data-bind="checked: announceEnter" />
+		<label for="joinerAnnounceEnter">Announce Enter</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="joinerAnnounceExit" data-bind="checked: announceLeave" />
+		<label for="joinerAnnounceExit">Announce Exit</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="joinerAnnounceMute" data-bind="checked: announceMute" />
+		<label for="joinerAnnounceMute">Announce Mute</label>
+	</div>
+	<div class="form-group">
+		<input type="checkbox" class="form-check-inline" id="joinerAnnounceUnmute" data-bind="checked: announceUnmute" />
+		<label for="joinerAnnounceUnmute">Announce Unmute</label>
 	</div>
 	<input type="button" class="btn btn-primary" data-bind="click: $parent.joinCall" value="Add Joiner" />
 </div>

@@ -242,6 +242,45 @@
         }
       }
     },
+    "/calls/{callId}/joiners/{joinerId}/pre-twiml": {
+      "get": {
+        "tags": [
+          "Twilio"
+        ],
+        "parameters": [
+          {
+            "name": "callId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "joinerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "digits",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/calls/{callId}/joiners/{joinerId}/twiml": {
       "get": {
         "tags": [
@@ -486,6 +525,15 @@
         },
         "additionalProperties": false
       },
+      "AnnouncementType": {
+        "enum": [
+          "Join",
+          "Leave",
+          "Unmute",
+          "Mute"
+        ],
+        "type": "string"
+      },
       "Agent": {
         "type": "object",
         "properties": {
@@ -504,6 +552,13 @@
           "lastName": {
             "type": "string",
             "nullable": true
+          },
+          "announcements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnnouncementType"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -521,6 +576,13 @@
           },
           "lastName": {
             "type": "string",
+            "nullable": true
+          },
+          "announcements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnnouncementType"
+            },
             "nullable": true
           }
         },
@@ -590,6 +652,13 @@
           },
           "requireUnmute": {
             "type": "boolean"
+          },
+          "announcements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnnouncementType"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
